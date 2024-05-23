@@ -42,7 +42,7 @@ def initiate_tun_fd(dev_name):
 
 # ------- Sockets and Networking ---------
 def create_sockets(interface_name):
-    # Create a RAW Socket to send the traffic
+    # Create a RAW Socket to sends the traffic
     sender = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP)
     sender.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sender.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
