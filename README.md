@@ -64,8 +64,8 @@ Virtual Machines used for testing : </br>
 ![test1](./screenshots/test2.jpg)
 
 # How to run?
-1. Runing the script is simple, you must have root privelages. Run the `main.py` file to begin the Tunnel. 
-2. ``sudo python3 main.py ens38 -dst 192.168.1.100 -key 256 -tun asa0``.
+1. Runing the script is simple, you must have root privelages. Run the `scapy_interface_test` file to begin the Tunnel. 
+2. ``sudo python3 scapy_interface_test enp0s3 -dst 192.168.100.6 -key 256 -tun asa0``.
 
 ![usage](./screenshots/usage.jpg)
 
