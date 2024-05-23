@@ -49,11 +49,11 @@ Virtual Machines used for testing : </br>
 2. CentOs Linux 
 
 #### UBUNTU VM
-- Physical Interface = 192.168.1.1/24 Static Ip
+- Physical Interface = 192.168.100.6/24 Static Ip
 - Logical Interface (asa0)   = 10.0.1.1/24     Static Ip
 
 #### CENTOS VM
-- Physical Interface = 192.168.1.100/24 Static Ip
+- Physical Interface = 192.168.100.4/24 Static Ip
 - Logical Interface (asa0)  = 10.0.1.2/24      Static Ip
 
 
