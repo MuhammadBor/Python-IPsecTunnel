@@ -1,6 +1,18 @@
 import struct
 import socket
 from ctypes import *
+import scapy.all as scapy
+from scapy.layers.ipsec import SecurityAssociation, AH
+from scapy.utils import PcapWriter
+
+# sa_send = SecurityAssociation(AH, spi=0x222,
+#                          auth_algo='HMAC-SHA1-96', auth_key=b'secret key',
+#                          tunnel_header=IP(src='192.168.100.6', dst='192.168.100.4'))
+
+# sa_recv= SecurityAssociation(AH, spi=0x222,
+#                          auth_algo='HMAC-SHA1-96', auth_key=b'secret key',
+#                          tunnel_header=IP(src='192.168.100.4', dst='192.168.100.6'))
+
 
 class ESPHeader:
     def __init__(self, encrypted_payload):
@@ -64,12 +76,21 @@ class IPHeader:
 
 def unpack_ipv4(packet):
     iph = struct.unpack('!BBHHHBBH4s4s', packet[:20])
-
     version_ihl = iph[0]
     version = version_ihl >> 4
     ih_len = (version_ihl & 0xF) * 4
     ttl = iph[5]
     protocol = iph[6]
+    print("protocol is: ", protocol)
     s_addr = socket.inet_ntoa(iph[8])
     d_addr = socket.inet_ntoa(iph[9])
     return s_addr, d_addr, protocol
+
+def unpack_ipv4ah(packet):
+    #print(type(packet))
+    scapy.packet.bind_layers(scapy.AH, scapy.IP, nh=4)
+    packet_scapy = scapy.Ether(packet)
+    if scapy.IP in packet_scapy:
+        print("This is proto", packet_scapy[scapy.IP].proto)
+        #print("A packet has been recieved with below protocol")
+        return packet_scapy, packet_scapy[scapy.IP].proto
