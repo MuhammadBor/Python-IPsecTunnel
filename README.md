@@ -36,6 +36,9 @@ In the CentOs Machine , run following commands to setup a TUN interface called a
 
 ![tun1](./screenshots/tun2.jpg)
 
+You can alternatively run the bash script on the designated machines:
+1. On VM1 (Ubuntu): ``sudo bash setup_tun_vm1.sh``
+2. On VM2 (CentOs): ``sudo bash setup_tun_vm2.sh``
 
 # How this Tunnel works?
 
