@@ -3,7 +3,7 @@ import socket
 from ctypes import *
 import scapy.all as scapy
 from scapy.layers.ipsec import SecurityAssociation, AH
-from scapy.utils import PcapWriter
+from scapy.utils import wrpcap
 
 # sa_send = SecurityAssociation(AH, spi=0x222,
 #                          auth_algo='HMAC-SHA1-96', auth_key=b'secret key',
@@ -90,7 +90,9 @@ def unpack_ipv4ah(packet):
     #print(type(packet))
     scapy.packet.bind_layers(scapy.AH, scapy.IP, nh=4)
     packet_scapy = scapy.Ether(packet)
-    if scapy.IP in packet_scapy:
-        print("This is proto", packet_scapy[scapy.IP].proto)
+    if packet_scapy[scapy.IP].proto == 51:
+        print("This is AH packet")
         #print("A packet has been recieved with below protocol")
-        return packet_scapy, packet_scapy[scapy.IP].proto
+        return packet_scapy
+    else:
+        return None

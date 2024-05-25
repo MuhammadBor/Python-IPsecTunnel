@@ -58,9 +58,8 @@ def create_sockets(interface_name):
     sender.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sender.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     sender.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
-    ETH_P_ALL = 3
     # Raw socket to recv the traffic
-    receiver = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(ETH_P_ALL))
+    receiver = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(0x0800))
     receiver.bind((interface_name, 0))
 
     return sender, receiver
@@ -75,47 +74,22 @@ def send_packets(sock: socket.socket, host_ip: str, dst_ip: str, cipher: AESCiph
         sock.sendto(raw(packet), (dst_ip, 0))
         packet_from_fd = read_from_fd(fd)
 
-def print_packet(packet):
-    # Print packet as hexadecimal
-    try:
-        ip_pkt = IP(packet)
-        print("Packet parsed by Scapy:")
-        ip_pkt.show()
-        # Check if the packet has an ICMP layer
-        if ICMP in ip_pkt:
-            icmp_pkt = ip_pkt[ICMP]
-            print("\nICMP Packet Details:")
-            print(f"Type: {icmp_pkt.type}")
-            print(f"Code: {icmp_pkt.code}")
-            print(f"Checksum: {icmp_pkt.chksum}")
-            print(f"ID: {icmp_pkt.id}")
-            print(f"Sequence: {icmp_pkt.seq}")
-        e = sa_send.encrypt(ip_pkt)
-        print("######### This is AH added ########")
-        print(e[IP].proto)
-        e.show()
-        print("finished priniting")
-        print("######### This is AH removed ########")
-        print("####### Print metadata")
-    except Exception as e:
-        print(f"Could not parse packet with Scapy: {e}")
-
-
 
 def recv_packets(sock: socket.socket, host_ip: str, dst_ip: str, cipher: AESCipher, fd):
     packet_from_socket = sock.recv(2048)
-    while packet_from_socket:
-        packet_scapy, protocol = unpack_ipv4ah(packet_from_socket)
+    while packet_from_socket: 
+        recv_packet = unpack_ipv4ah(packet_from_socket)
         # protocol 51 == AH Header
-        if protocol == 51:
+        if recv_packet is None:
+            print("None Packet")
+        else:
+            packet_scapy = recv_packet
             print("############## THis is protocol 51 ##########3")
             IP_layer = packet_scapy[IP]
-            #wrpcap('captured_cccc2.pcap', packet_scapy)
-            #print("THis is protocol 51") 
             #IP_layer.show()
             decrypted_packet = sa_recv.decrypt(IP_layer)
             print("Successfully Decapsuated") 
-            print("THis is protocol 51 decrypted") 
+            print("This is protocol 51 decrypted") 
             # decrypt the packet
             decrypted_packet.show()
             #wrpcap('decaptured_cccc.pcap', decrypted_packet)
