@@ -75,9 +75,10 @@ Virtual Machines used for testing : </br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - Python 3.8.2      
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - Ubuntu 20.10 Virtual Machine.    
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - Four Interfaces with IP configured.        
-4. Dependencies.      </br>
+4. Dependencies.</br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - pip3 install pycryptodome     
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - pip3 install netifaces  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - pip3 install argparse
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - pip3 install scapy  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - pip3 install scapy 
+
 
