@@ -1,6 +1,6 @@
 # Python IPsec AH Tunnel Mode
 Transmitting IP packets through the public internet is a bad idea due to bad guys who might be waiting to grab our confidential data in IP packet payloads. One solution for this would be building our own wired network infrastructure with our own cables, routers and stuff which will be physically protected against wiretapping. However unfortunately, this is not practical. Therefore, the next choice we have is encrypting our IP packets as a whole or partially which can be sent as a payload of another IP packet through the Internet. This is how some flavors
-of IPSec work (i.e. ESP).
+of IPSec work (i.e. AH).
 
 #### ARTICLE 
    https://blog.jadhusan.com/ipsec-tunneling/
