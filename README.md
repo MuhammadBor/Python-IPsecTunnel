@@ -1,6 +1,6 @@
 # Python IPsec AH Tunnel Mode
 
-AH is used to authenticate — but not encrypt — IP traffic, serving three main purposes: verifying the identity of the communication partners, detecting any data alterations during transit, and optionally protecting against replay attacks where intercepted data is reintroduced into the network.
+Authentication Header (AH) is used to authenticate — but not encrypt — IP traffic, serving three main purposes: verifying the identity of the communication partners, detecting any data alterations during transit, and optionally protecting against replay attacks where intercepted data is reintroduced into the network.
 
 Authentication involves calculating a cryptographic hash-based message authentication code over most IP packet fields (excluding mutable ones like TTL or the header checksum). This code is then stored in an added AH header and sent to the recipient. The AH header, inserted between the original IP header and the payload, comprises five key fields as depicted in the below figure. 
 
@@ -9,7 +9,7 @@ Image source and further reading: [An Illustrated Guide to IPsec](http://www.uni
 ![AH Header](http://www.unixwiz.net/images/IPSec-AH-Tunnel-Mode.gif)
 
 
-This project implements an Authentication Header (AH) tunnel mode between two hosts to ensure data integrity and source authentication. By using AH, the project provides a mechanism for authentication of the origin, checks the integrity of the transmitted data, and protects against replay attacks without encrypting the data payload. This implementation is crucial for environments where data confidentiality is less critical than the assurance of data origin and integrity.
+This project implements an AH tunnel mode between two hosts to ensure data integrity and source authentication. By using AH, the project provides a mechanism for authentication of the origin, checks the integrity of the transmitted data, and protects against replay attacks without encrypting the data payload. This implementation is crucial for environments where data confidentiality is less critical than the assurance of data origin and integrity.
 
 Extra reading: https://blog.jadhusan.com/ipsec-tunneling/
 
