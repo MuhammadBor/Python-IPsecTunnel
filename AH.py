@@ -11,22 +11,14 @@ import time
 # CUSTOM IMPORTS
 from imports.headers import unpack_ipv4ah
 from imports.aes import AESCipher
-from scapy.all import IP, ICMP, raw, Raw, sr1, wrpcap
+from scapy.all import IP, raw
 from scapy.layers.ipsec import SecurityAssociation, AH
-from scapy.utils import PcapWriter
 
-sa_send = SecurityAssociation(AH, spi=0x222,
-                         auth_algo='HMAC-SHA1-96', auth_key=b'secret key',
-                         tunnel_header=IP(src='192.168.100.6', dst='192.168.100.4'))
 
-sa_recv= SecurityAssociation(AH, spi=0x222,
-                         auth_algo='HMAC-SHA1-96', auth_key=b'secret key',
-                         tunnel_header=IP(src='192.168.100.4', dst='192.168.100.6'))
 # ---------- File Descriptors -----------
 def read_from_fd(fd):
     # Read a packet from the file descriptor
     packet_data = os.read(fd, 1024)
-    
     return packet_data
 
 
@@ -59,57 +51,61 @@ def create_sockets(interface_name):
     sender.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     sender.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
     # Raw socket to recv the traffic
-    receiver = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(0x0800))
+    receiver = socket.socket(socket.AF_PACKET, socket.SOCK_RAW,
+                             socket.htons(0x0800))
     receiver.bind((interface_name, 0))
 
     return sender, receiver
 
 
-def send_packets(sock: socket.socket, host_ip: str, dst_ip: str, cipher: AESCipher, fd):
-    #ip_h = IPHeader(host_ip, dst_ip)  # create an IP header
+def send_packets(sock: socket.socket, host_ip: str, dst_ip: str,
+                 cipher: AESCipher, fd):
     packet_from_fd = read_from_fd(fd)
     while packet_from_fd:
+        # create an AH Tunnel mode packet
         packet = AHHeader(packet_from_fd, host_ip, dst_ip)
-        print("Just before sending: ")
+        print("AH packet is sent.")
+        # send the raw AH packet to dst
         sock.sendto(raw(packet), (dst_ip, 0))
         packet_from_fd = read_from_fd(fd)
 
 
-def recv_packets(sock: socket.socket, host_ip: str, dst_ip: str, cipher: AESCipher, fd):
+def recv_packets(sock: socket.socket, host_ip: str, dst_ip: str,
+                 cipher: AESCipher, fd):
     packet_from_socket = sock.recv(2048)
-    while packet_from_socket: 
+    while packet_from_socket:
+        # try to unpack the recv packets
         recv_packet = unpack_ipv4ah(packet_from_socket)
-        # protocol 51 == AH Header
+        # discarding the None AH packets
         if recv_packet is None:
-            print("None Packet")
+            print("None-AH Packet. Discarding.")
+        # processing AH packets here
         else:
             packet_scapy = recv_packet
-            print("############## THis is protocol 51 ##########3")
+            print("############## recv: protocol 51 AH  ##########")
             IP_layer = packet_scapy[IP]
-            #IP_layer.show()
             decrypted_packet = sa_recv.decrypt(IP_layer)
-            print("Successfully Decapsuated") 
-            print("This is protocol 51 decrypted") 
+            print("Integrity checking passed! --- AH Decapsulated")
             # decrypt the packet
+            print("Decapsulated AH packet is : ")
             decrypted_packet.show()
-            #wrpcap('decaptured_cccc.pcap', decrypted_packet)
-            #write to file descriptor so it can be read and sent
             write_to_fd(fd, raw(decrypted_packet))
 
         packet_from_socket = sock.recv(2048)
-
 # ------- END : Sockets and Networking ---------
 
+
+# ------- AH Packet Creation ---------
 def AHHeader(packet_from_fd: bytes, host_ip: str, dst_ip: str):
     try:
         # Create a Scapy packet from the raw data
         original_packet = IP(packet_from_fd)
         # Check if it's an IP packet and not something else like ARP
         if IP in original_packet:
-            # Encrypt the original packet with AH, encapsulating it in AH and then in the new outer IP
+            # encapsulating original packet with AH within new outer IP
             encrypted_packet = sa_send.encrypt(original_packet)
 
-            # Return the encrypted packet
+            # Return the encapsulated packet
             return encrypted_packet
 
         else:
@@ -118,16 +114,20 @@ def AHHeader(packet_from_fd: bytes, host_ip: str, dst_ip: str):
     except Exception as e:
         # Raise an exception with error message
         raise Exception(f"Error processing packet: {str(e)}")
-    
+# ------- END : AH Packet Creation ---------
 
-# function gets user arguments and returns an object
+
 def user_args():
     parser = argparse.ArgumentParser(allow_abbrev=False, description="Tunnel")
 
     parser.add_argument("interface", help="Interface to be binded to.")
-    parser.add_argument('--destination-ip', '-dst', action='store',type=str, help="Destination IP", required=True)
-    parser.add_argument('--encrypt-key', '-key', action='store', type=str,help="Encryption key used for connection", required=True)
-    parser.add_argument('--tun-int-name', '-tun', action='store',type=str, help="TUN int name", required=True)
+    parser.add_argument('--destination-ip', '-dst', action='store', type=str,
+                        help="Destination IP", required=True)
+    parser.add_argument('--encrypt-key', '-key', action='store', type=str,
+                        help="Encryption key used for connection",
+                        required=True)
+    parser.add_argument('--tun-int-name', '-tun', action='store', type=str,
+                        help="TUN int name", required=True)
     args = parser.parse_args()
 
     return args
@@ -146,6 +146,17 @@ if __name__ == "__main__":
     # Get the IP from interface name
     host_ip = netifaces.ifaddresses(args.interface)[2][0]['addr']
     print("This is host ip", host_ip)
+
+    # ---------- AH-SA Configuration -----------
+    sa_send = SecurityAssociation(AH, spi=0x222, auth_algo='HMAC-SHA1-96',
+                                auth_key=b'secret key',
+                                tunnel_header=IP(src=host_ip,
+                                                dst=args.destination_ip))
+
+    sa_recv = SecurityAssociation(AH, spi=0x222,
+                                auth_algo='HMAC-SHA1-96', auth_key=b'secret key',
+                                tunnel_header=IP(src=args.destination_ip,
+                                                dst=host_ip))
 
     # Create threads for sending and receiving packets
     sendT = threading.Thread(target=send_packets, args=(
@@ -166,5 +177,3 @@ if __name__ == "__main__":
                 time.sleep(0.2)
         except KeyboardInterrupt:
             sys.exit(1)
-
-            

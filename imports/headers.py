@@ -2,27 +2,18 @@ import struct
 import socket
 from ctypes import *
 import scapy.all as scapy
-from scapy.layers.ipsec import SecurityAssociation, AH
-from scapy.utils import wrpcap
-
-# sa_send = SecurityAssociation(AH, spi=0x222,
-#                          auth_algo='HMAC-SHA1-96', auth_key=b'secret key',
-#                          tunnel_header=IP(src='192.168.100.6', dst='192.168.100.4'))
-
-# sa_recv= SecurityAssociation(AH, spi=0x222,
-#                          auth_algo='HMAC-SHA1-96', auth_key=b'secret key',
-#                          tunnel_header=IP(src='192.168.100.4', dst='192.168.100.6'))
 
 
 class ESPHeader:
     def __init__(self, encrypted_payload):
-        spi = socket.inet_aton('0.0.0.0') #4bytes
-        seq = 1 #4bytes
-        payload = encrypted_payload #size varies
+        spi = socket.inet_aton('0.0.0.0')  # 4bytes
+        seq = 1  # 4bytes
+        payload = encrypted_payload  # size varies
         esp_part1 = struct.pack("4sI", spi, seq)
         esp_payload_part2 = payload
         
-        self.payload = esp_part1 + esp_payload_part2 
+        self.payload = esp_part1 + esp_payload_part2
+
 
 class IPHeader:
     # https://www.bitforestinfo.com/blog/12/26/code-to-create-ipv4-packet-header-in-python.html
@@ -74,6 +65,7 @@ class IPHeader:
 
         self.assemble_ipv4_feilds()
 
+
 def unpack_ipv4(packet):
     iph = struct.unpack('!BBHHHBBH4s4s', packet[:20])
     version_ihl = iph[0]
@@ -86,13 +78,12 @@ def unpack_ipv4(packet):
     d_addr = socket.inet_ntoa(iph[9])
     return s_addr, d_addr, protocol
 
+
 def unpack_ipv4ah(packet):
-    #print(type(packet))
     scapy.packet.bind_layers(scapy.AH, scapy.IP, nh=4)
     packet_scapy = scapy.Ether(packet)
     if packet_scapy[scapy.IP].proto == 51:
-        print("This is AH packet")
-        #print("A packet has been recieved with below protocol")
+        # print("This is AH packet")
         return packet_scapy
     else:
         return None
