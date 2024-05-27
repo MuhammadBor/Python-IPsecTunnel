@@ -4,7 +4,7 @@ AH is used to authenticate — but not encrypt — IP traffic, serving three mai
 
 Authentication involves calculating a cryptographic hash-based message authentication code over most IP packet fields (excluding mutable ones like TTL or the header checksum). This code is then stored in an added AH header and sent to the recipient. The AH header, inserted between the original IP header and the payload, comprises five key fields as depicted in the below figure. 
 
-Image source and further reading: [An Illustrated Guide to IPse](http://www.unixwiz.net/techtips/iguide-ipsec.html "IPsec")
+Image source and further reading: [An Illustrated Guide to IPsec](http://www.unixwiz.net/techtips/iguide-ipsec.html "IPsec")
 
 ![AH Header](http://www.unixwiz.net/images/IPSec-AH-Tunnel-Mode.gif)
 
