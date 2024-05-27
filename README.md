@@ -6,7 +6,7 @@ Authentication involves calculating a cryptographic hash-based message authentic
 
 Image source and further reading: [An Illustrated Guide to IPse](http://www.unixwiz.net/techtips/iguide-ipsec.html "IPsec")
 
-![AH Header](http://www.unixwiz.net/images/IPSec-AH-Transport-Mode.gif)
+![AH Header](http://www.unixwiz.net/images/IPSec-AH-Tunnel-Mode.gif)
 
 
 This project implements an Authentication Header (AH) tunnel mode between two hosts to ensure data integrity and source authentication. By using AH, the project provides a mechanism for authentication of the origin, checks the integrity of the transmitted data, and protects against replay attacks without encrypting the data payload. This implementation is crucial for environments where data confidentiality is less critical than the assurance of data origin and integrity.
