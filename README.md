@@ -38,12 +38,12 @@ You can alternatively run the bash script on the designated machines:
 
 # How this Tunnel works?
 
-Basically, This Tunnel program runs in ubuntu box with two NIC interface, which one is assigned a static IP Address and other one is TUN interface that works as a virtual NIC. We have to excute the same file in both the machines to work. After excuting, we will send ICMP  request {ping} from Virtual NIC (asa0) on VM1 to VM2. Use the following command ``ping -I 10.0.1.1 10.0.1.2``. The Ping will send a ICMP request from vm1 to vm2 but the asa0 has no routing therefore ``AH.py`` will capture the traffic and calculate the ```icv``` value for the packet with current configuration defined in ``SecurityAssociation``. Then, script encapsulates the packet within new IP packet and send it to Physical NIC on VM2. When the packet arrives to VM2's physical NIC, the integrity verification is done and the packet will be written into it's Virtual NIC(asa0). Then VM2's Virtual NIC will send a ICMP reply to the request (ping) in the same manner. 
+Basically, this Tunnel program runs in ubuntu with two NIC interface, which one is assigned a static IP Address and other one is TUN interface that works as a virtual NIC. We have to excute the same file in both the machines to work. After excuting, we will send ICMP  request {ping} from Virtual NIC (asa0) on VM1 to VM2. Use the following command ``ping -I 10.0.1.1 10.0.1.2``. The Ping will send a ICMP request from VM1 to VM2 but the asa0 has no routing therefore ``AH.py`` will capture the traffic and calculate the ```icv``` value for the packet with current configuration defined in ``SecurityAssociation``. Then, script encapsulates the packet within new IP packet and send it to physical NIC on VM2. When the packet arrives to VM2's physical NIC, the integrity verification is done and the decapsulated packet will be written into it's virtual NIC(asa0). Then VM2's virtual NIC will send a ICMP reply to the request (ping) in the same manner. 
 
 ## EXAMPLE
 Virtual Machines used for testing : </br>
-1. Ubuntu 20.10
-2. CentOs Linux 
+1. Ubuntu 20.10 (VM1)
+2. CentOs Linux (VM2)
 
 #### UBUNTU VM
 - Physical Interface = 192.168.100.6/24 Static Ip
@@ -61,7 +61,8 @@ Virtual Machines used for testing : </br>
 
 # How to run? 
 1. Runing the script is simple, you must have root privelages. Run the `AH.py` file to begin the Tunnel. 
-2. ``sudo python3 AH.py enp0s3 -dst 192.168.100.6 -key 256 -tun asa0``.
+2. For VM1: ``sudo python3 AH.py enp0s3 -dst 192.168.100.4 -key 256 -tun asa0``
+3. For VM2: ``sudo python3 AH.py enp0s3 -dst 192.168.100.6 -key 256 -tun asa0``
 # Wireshark Analysis
 
 <img src="./screenshots/AH_wireshark.JPG" width="80%" alt="AH Ping Result">
