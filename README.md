@@ -1,6 +1,6 @@
 # Python IPsec AH Tunnel Mode
 Transmitting IP packets through the public internet is a bad idea due to bad guys who might be waiting to grab our confidential data in IP packet payloads. One solution for this would be building our own wired network infrastructure with our own cables, routers and stuff which will be physically protected against wiretapping. However unfortunately, this is not practical. Therefore, the next choice we have is encrypting our IP packets as a whole or partially which can be sent as a payload of another IP packet through the Internet. This is how some flavors
-of IPSec work (i.e. ESP).
+of IPSec work (i.e. AH).
 
 #### ARTICLE 
    https://blog.jadhusan.com/ipsec-tunneling/
@@ -36,6 +36,9 @@ In the CentOs Machine , run following commands to setup a TUN interface called a
 
 ![tun1](./screenshots/tun2.jpg)
 
+You can alternatively run the bash script on the designated machines:
+1. On VM1 (Ubuntu): ``sudo bash setup_tun_vm1.sh``
+2. On VM2 (CentOs): ``sudo bash setup_tun_vm2.sh``
 
 # How this Tunnel works?
 
@@ -72,8 +75,9 @@ Virtual Machines used for testing : </br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - Python 3.8.2      
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - Ubuntu 20.10 Virtual Machine.    
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - Four Interfaces with IP configured.        
-4. Dependencies.      </br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - pip3 install pycryptodome     
+4. Dependencies.</br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - pip3 install scapy     
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - pip3 install netifaces  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - pip3 install argparse  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - pip3 install argparse
+
 
